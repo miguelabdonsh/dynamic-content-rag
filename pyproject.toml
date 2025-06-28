@@ -1,0 +1,11 @@
+[project]
+name = "dynamic-content-rag"
+version = "0.1.0"
+description = "Sistema de Generación de Contenido Dinámico Basado en RAG con CrawlAI Docker"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    # Solo HTTP client para CrawlAI Docker API
+    "aiohttp",
+    "requests",
+]

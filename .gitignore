@@ -1,0 +1,401 @@
+# ============================================================
+# PYTHON & GENERAL
+# ============================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+.eggs/
+.eggs-info/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env*
+.llm.env
+ENV/
+env.bak/
+venv.bak/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# ============================================================
+# OPERATING SYSTEMS
+# ============================================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# ============================================================
+# EDITORS & IDEs
+# ============================================================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm / IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.vimrc.local
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================================
+# PROJECT SPECIFIC - RAG & CRAWLING
+# ============================================================
+
+# Crawled data and content
+
+data/scraped/
+data/content/
+data/raw/
+data/processed/
+crawled_data/
+scraped_content/
+*.crawl
+content_*.json
+content_*.md
+articles_*.json
+articles_*.md
+
+# Extracted content by date/site
+coindesk_*.json
+coindesk_*.md
+cointelegraph_*.json
+cointelegraph_*.md
+*_articles_*.json
+*_articles_*.md
+
+# ============================================================
+# VECTOR DATABASES & EMBEDDINGS
+# ============================================================
+
+# Qdrant database files
+data/qdrant/
+qdrant_data/
+qdrant/
+*.qdrant
+collections/
+snapshots/
+raft_state.json
+meta.json
+aliases/data.json
+
+# Vector embeddings and indexes
+embeddings/
+vectors/
+*.pkl
+*.joblib
+*.npy
+*.npz
+embeddings_*.json
+vector_store/
+faiss_index/
+*.faiss
+
+# Sentence transformers cache
+.cache/huggingface/
+.cache/torch/
+sentence_transformers/
+
+# ============================================================
+# CACHING & DATABASES
+# ============================================================
+
+# Redis
+data/redis/
+redis_data/
+dump.rdb
+redis.conf
+*.rdb
+
+# SQLite
+*.sqlite
+*.sqlite3
+*.db
+
+# Other databases
+*.duckdb
+
+# ============================================================
+# MACHINE LEARNING & AI
+# ============================================================
+
+# Model files and checkpoints
+models/
+checkpoints/
+saved_models/
+*.model
+*.h5
+*.pth
+*.pt
+*.ckpt
+*.bin
+*.safetensors
+
+# Training outputs
+runs/
+wandb/
+tensorboard_logs/
+logs/training/
+experiments/
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+*.ipynb
+
+# ============================================================
+# DOCKER & CONTAINERIZATION
+# ============================================================
+
+# Docker environment files
+docker/.env
+docker/.env.local
+docker/.env.production
+.dockerignore.local
+
+# Docker volumes and data
+docker/volumes/
+docker_data/
+
+# Process IDs
+*.pid
+
+# ============================================================
+# LOGS & MONITORING
+# ============================================================
+
+# Application logs
+logs/
+*.log
+*.log.*
+log_*.txt
+crawler_*.log
+rag_*.log
+api_*.log
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+*.swp
+*.swo
+
+# ============================================================
+# API & WEB SPECIFIC
+# ============================================================
+
+# FastAPI
+.sessions/
+upload_tmp/
+
+# Flask
+instance/
+.webassets-cache
+
+# Web assets
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ============================================================
+# CONFIGURATION & SECRETS
+# ============================================================
+
+# Environment and config files
+.env*
+!.env.example
+config.local.yml
+config.local.yaml
+secrets.yml
+secrets.yaml
+*.pem
+*.key
+*.crt
+*.p12
+
+# API keys and credentials
+api_keys.txt
+credentials.json
+service_account.json
+*_credentials.json
+.secrets/
+
+# ============================================================
+# DATA & ANALYTICS
+# ============================================================
+
+# Large data files
+*.csv
+*.parquet
+*.jsonl
+*.tsv
+data_*.json
+dataset_*.json
+
+# Analytics and metrics
+metrics/
+analytics/
+stats/
+reports/
+
+# ============================================================
+# DEVELOPMENT & TESTING
+# ============================================================
+
+# Local development
+.local/
+tmp/
+temp/
+scratch/
+playground/
+
+# Performance profiling
+*.prof
+*.cprof
+*.profile
+
+# Memory dumps
+*.hprof
+core.*
+
+# ============================================================
+# PACKAGE MANAGERS
+# ============================================================
+
+# UV (Python package manager)
+uv.lock
+
+# Poetry
+poetry.lock
+
+# Pipenv
+Pipfile.lock
+
+# Conda
+.conda/
+
+# ============================================================
+# COMPRESSION & ARCHIVES
+# ============================================================
+
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.zip
+*.rar
+*.7z
+*.gz
+*.bz2
+*.xz
+
+# ============================================================
+# CUSTOM PROJECT PATTERNS
+# ============================================================
+
+# Custom data directories
+/data_backup/
+/exports/
+/imports/
+/sync/
+
+# Custom script outputs
+scripts/*.log
+scripts/output/
+scripts/temp/
+
+# Testing artifacts
+test_output/
+test_data/
+mock_data/
+
+# Documentation builds
+docs/_build/
+docs/build/
+site/
+
+
+# ============================================================
+# EXTRA
+# ============================================================
+
+docs/
