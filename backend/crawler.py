@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
 """
-Crawler optimizado para CoinDesk - Preparado para RAG
-Solo extrae de latest-crypto-news y markets
+Crawler optimized for CoinDesk - Ready for RAG
+Only extracts from latest-crypto-news and markets
 """
 
 import asyncio
@@ -12,31 +11,31 @@ from pathlib import Path
 import aiohttp
 import logging
 
-# Configurar logging
+# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 class CoinDeskCrawler:
-    """Crawler optimizado para CoinDesk con prevención de duplicados"""
+    """Crawler optimized for CoinDesk with duplicate prevention"""
     
     def __init__(self, crawlai_url="http://localhost:11235"):
         self.crawlai_url = crawlai_url
         self.output_dir = Path("data/crawled")
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
-        # Secciones objetivo
+        # Target sections
         self.base_url = "https://www.coindesk.com"
         self.sections = [
             "https://www.coindesk.com/latest-crypto-news",
             "https://www.coindesk.com/markets"
         ]
         
-        # Configuración
+        # Configuration
         self.max_articles_per_section = 15
         self.request_delay = 2
         
     async def check_crawlai(self):
-        """Verificar CrawlAI"""
+        """Check CrawlAI"""
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(f"{self.crawlai_url}/health") as response:
@@ -45,7 +44,7 @@ class CoinDeskCrawler:
             return False
     
     async def crawl_url(self, url: str) -> dict:
-        """Crawlear URL usando CrawlAI API"""
+        """Crawl URL using CrawlAI API"""
         payload = {
             "urls": [url],
             "browser_config": {"type": "BrowserConfig", "params": {"headless": True}},
@@ -73,7 +72,7 @@ class CoinDeskCrawler:
             return {"success": False}
     
     def extract_article_links(self, crawl_result: dict) -> list:
-        """Extraer enlaces de artículos válidos"""
+        """Extract valid article links"""
         if not crawl_result.get("success") or not crawl_result.get("results"):
             return []
         
@@ -81,7 +80,7 @@ class CoinDeskCrawler:
         links_data = result.get("links", {})
         links = []
         
-        # Procesar enlaces internos y externos
+        # Process internal and external links
         for link_type in ["internal", "external"]:
             for link_info in links_data.get(link_type, []):
                 href = link_info.get("href", "") if isinstance(link_info, dict) else str(link_info)
@@ -99,18 +98,18 @@ class CoinDeskCrawler:
         return list(set(links))[:self.max_articles_per_section]
     
     def is_valid_article(self, url: str) -> bool:
-        """Verificar si es un artículo válido"""
+        """Check if it's a valid article"""
         if not url.startswith(self.base_url):
             return False
         
-        # Patrón de artículo con fecha
+        # Article pattern with date
         if re.search(r'/(?:markets|policy|tech|finance|news|business|opinion)/202[0-9]/\d{2}/\d{2}/.+', url):
             return True
         
-        # Artículos largos válidos
+        # Valid long articles
         url_parts = url.replace(self.base_url, '').split('/')
         if len(url_parts) >= 4 and len(url_parts[-1]) > 20:
-            # Excluir URLs no deseadas
+            # Exclude unwanted URLs
             exclude_patterns = [
                 r'\.(?:ico|svg|png|jpg|gif|css|js|pdf)$',
                 r'/(?:favicon|logo|icon|img|images|static|assets|tag|author|price|newsletters|videos|podcasts|events|advertise|about|contact|privacy|terms|careers|search|feed|rss)',
@@ -122,26 +121,26 @@ class CoinDeskCrawler:
         return False
     
     def extract_title_from_url(self, url: str) -> str:
-        """Extraer título desde URL"""
+        """Extract title from URL"""
         title = url.split('/')[-1]
-        title = re.sub(r'[?#].*', '', title)  # Remover parámetros
+        title = re.sub(r'[?#].*', '', title)  # Remove parameters
         return title
     
     def article_exists(self, title: str) -> bool:
-        """Verificar si ya existe un artículo con este título"""
+        """Check if an article with this title already exists"""
         pattern = f"*{title}*.json"
         existing_files = list(self.output_dir.glob(pattern))
         if existing_files:
-            logger.info(f"Artículo ya existe: {title}")
+            logger.info(f"Article already exists: {title}")
             return True
         return False
     
     def clean_content_for_rag(self, markdown: str) -> str:
-        """Limpiar contenido agresivamente para RAG"""
+        """Aggressively clean content for RAG"""
         if not markdown:
             return ""
         
-        # Remover elementos no deseados en una sola pasada
+        # Remove unwanted elements in one pass
         markdown = re.sub(r'!\[.*?\]\(.*?\)', '', markdown)  
         markdown = re.sub(r'\[.*?\]\(.*?\)', '', markdown)   
         markdown = re.sub(r'#{1,6}\s*', '', markdown)       
@@ -151,7 +150,7 @@ class CoinDeskCrawler:
         lines = markdown.split('\n')
         cleaned_lines = []
         
-        # Patrones agresivos para RAG
+        # Aggressive patterns for RAG
         skip_patterns = [
             r'^\[.*\$.*\]',          
             r'^\* \[',               
@@ -179,14 +178,14 @@ class CoinDeskCrawler:
         for line in lines:
             line = line.strip()
             
-            # Saltar líneas vacías o muy cortas
+            # Skip empty or very short lines
             if not line or len(line) < 10:
                 continue
             
-            # Verificar patrones a saltar
+            # Check patterns to skip
             should_skip = any(re.search(pattern, line, re.IGNORECASE) for pattern in skip_patterns)
             
-            # Saltar líneas que parecen navegación o metadata
+            # Skip lines that look like navigation or metadata
             if (line.startswith('[') or 
                 line.startswith('*') or 
                 line.startswith('#') or
@@ -200,7 +199,7 @@ class CoinDeskCrawler:
             if not should_skip:
                 cleaned_lines.append(line)
         
-        # Unir y limpiar espacios extras
+        # Join and clean extra spaces
         content = '\n'.join(cleaned_lines)
         content = re.sub(r'\n{3,}', '\n\n', content)  
         content = re.sub(r'[ \t]+', ' ', content)     
@@ -208,14 +207,14 @@ class CoinDeskCrawler:
         return content.strip()
     
     def extract_article(self, crawl_result: dict, url: str) -> dict:
-        """Extraer y limpiar artículo"""
+        """Extract and clean article"""
         if not crawl_result.get("success") or not crawl_result.get("results"):
             return None
         
         result = crawl_result["results"][0]
         markdown_data = result.get("markdown", {})
         
-        # Obtener mejor contenido disponible
+        # Get best available content
         if isinstance(markdown_data, dict):
             markdown = markdown_data.get("fit_markdown") or markdown_data.get("raw_markdown", "")
         else:
@@ -224,7 +223,7 @@ class CoinDeskCrawler:
         title = self.extract_title_from_url(url)
         content = self.clean_content_for_rag(markdown)
         
-        # Validar contenido mínimo
+        # Validate minimum content
         if len(content) < 200 or not title:
             return None
         
@@ -236,55 +235,55 @@ class CoinDeskCrawler:
         }
     
     async def crawl_section(self, section_url: str) -> list:
-        """Crawlear artículos de una sección"""
+        """Crawl articles from a section"""
         section_name = section_url.split('/')[-1]
-        logger.info(f"Crawling sección: {section_name}")
+        logger.info(f"Crawling section: {section_name}")
         
-        # Obtener página de sección
+        # Get section page
         crawl_result = await self.crawl_url(section_url)
         if not crawl_result.get("success"):
-            logger.error(f"No se pudo obtener sección: {section_name}")
+            logger.error(f"Could not get section: {section_name}")
             return []
         
-        # Extraer enlaces
+        # Extract links
         article_links = self.extract_article_links(crawl_result)
         if not article_links:
-            logger.warning(f"No se encontraron artículos en {section_name}")
+            logger.warning(f"No articles found in {section_name}")
             return []
         
-        logger.info(f"Encontrados {len(article_links)} artículos en {section_name}")
+        logger.info(f"Found {len(article_links)} articles in {section_name}")
         
-        # Procesar artículos
+        # Process articles
         articles = []
         for i, article_url in enumerate(article_links, 1):
-            logger.info(f"Procesando {i}/{len(article_links)}: {article_url}")
+            logger.info(f"Processing {i}/{len(article_links)}: {article_url}")
             
-            # Verificar si ya existe
+            # Check if already exists
             title = self.extract_title_from_url(article_url)
             if self.article_exists(title):
                 continue
             
-            # Crawlear artículo
+            # Crawl article
             article_crawl = await self.crawl_url(article_url)
             article = self.extract_article(article_crawl, article_url)
             
             if article:
                 articles.append(article)
-                logger.info(f"Extraído: {title[:60]}...")
+                logger.info(f"Extracted: {title[:60]}...")
             else:
-                logger.warning(f"No se pudo extraer: {article_url}")
+                logger.warning(f"Could not extract: {article_url}")
             
             await asyncio.sleep(self.request_delay)
         
-        logger.info(f"{section_name} completado: {len(articles)} artículos nuevos")
+        logger.info(f"{section_name} completed: {len(articles)} new articles")
         return articles
     
     def save_article(self, article: dict, section_name: str):
-        """Guardar artículo si no existe"""
+        """Save article if not exists"""
         if self.article_exists(article['title']):
             return
         
-        # Generar nombre de archivo limpio
+        # Generate clean file name
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         safe_title = re.sub(r'[^\w\-]', '', article['title'].replace('-', '_'))[:50]
         filename = f"{section_name}_{safe_title}_{timestamp}.json"
@@ -293,14 +292,14 @@ class CoinDeskCrawler:
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(article, f, indent=2, ensure_ascii=False)
         
-        logger.info(f"Guardado: {filename}")
+        logger.info(f"Saved: {filename}")
     
     async def run(self):
-        """Ejecutar crawler"""
-        logger.info("Iniciando CoinDesk Crawler optimizado...")
+        """Run crawler"""
+        logger.info("Starting optimized CoinDesk Crawler...")
         
         if not await self.check_crawlai():
-            logger.error("CrawlAI no disponible")
+            logger.error("CrawlAI not available")
             return
         
         try:
@@ -310,18 +309,18 @@ class CoinDeskCrawler:
                 section_name = section_url.split('/')[-1]
                 articles = await self.crawl_section(section_url)
                 
-                # Guardar artículos nuevos
+                # Save new articles
                 for article in articles:
                     self.save_article(article, section_name)
                     total_new_articles += 1
             
-            logger.info(f"Crawler completado: {total_new_articles} artículos nuevos guardados")
+            logger.info(f"Crawler completed: {total_new_articles} new articles saved")
             
         except Exception as e:
-            logger.error(f"Error en crawler: {e}")
+            logger.error(f"Error in crawler: {e}")
 
 async def main():
-    """Función principal"""
+    """Main function"""
     crawler = CoinDeskCrawler()
     await crawler.run()
 

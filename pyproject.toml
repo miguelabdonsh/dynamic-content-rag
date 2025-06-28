@@ -1,11 +1,19 @@
 [project]
 name = "dynamic-content-rag"
 version = "0.1.0"
-description = "Sistema de Generación de Contenido Dinámico Basado en RAG con CrawlAI Docker"
+description = "Dynamic content generation with RAG system"
 readme = "README.md"
 requires-python = ">=3.12"
+
 dependencies = [
-    # Solo HTTP client para CrawlAI Docker API
-    "aiohttp",
-    "requests",
+    "aiohttp>=3.9.0",
+    "openai>=1.0.0",
+    "qdrant-client>=1.14.3",
+    "fastapi>=0.115.14",
+    "uvicorn[standard]>=0.35.0",
+    "redis>=6.2.0",
+    "pydantic>=2.11.7",
+    "google-generativeai>=0.8.5",
+    "PyYAML>=6.0.2",
+    "python-dotenv>=1.1.1",
 ]

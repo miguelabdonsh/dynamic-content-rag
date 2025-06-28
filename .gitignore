@@ -194,7 +194,6 @@ redis.conf
 # ============================================================
 
 # Model files and checkpoints
-models/
 checkpoints/
 saved_models/
 *.model
@@ -341,15 +340,6 @@ core.*
 # ============================================================
 # PACKAGE MANAGERS
 # ============================================================
-
-# UV (Python package manager)
-uv.lock
-
-# Poetry
-poetry.lock
-
-# Pipenv
-Pipfile.lock
 
 # Conda
 .conda/

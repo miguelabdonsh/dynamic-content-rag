@@ -1,0 +1,62 @@
+# RAG System Configuration
+# Sensitive variables loaded directly from environment
+
+# External Services
+services:
+  qdrant_url: http://localhost:6333
+  redis_url: redis://localhost:6379
+
+# API Server
+api:
+  host: 0.0.0.0
+  port: 8080
+  title: "Crypto RAG API"
+  description: "Dynamic content generation with RAG system for crypto news"
+  version: "0.2.0"
+  cors:
+    allow_origins: ["*"]
+    allow_methods: ["*"]
+    allow_headers: ["*"]
+
+# AI Configuration
+ai:
+  openai:
+    embedding_model: "text-embedding-ada-002"
+    max_embedding_batch: 100
+    timeout: 30
+  
+  google:
+    model: "gemini-2.0-flash-lite"
+    max_tokens: 1000
+    temperature: 0.1
+    timeout: 30
+
+# Qdrant
+vectordb:
+  qdrant:
+    collection_name: "crypto_articles"
+    vector_size: 1536
+    distance_metric: "cosine"
+    timeout: 10
+
+# Redis
+cache:
+  redis:
+    timeout: 5
+    ttl: 3600
+
+# Processing
+processing:
+  chunking:
+    chunk_size: 500
+    chunk_overlap: 50
+    min_chunk_size: 100
+  
+  search:
+    max_results: 5
+    score_threshold: 0.3
+
+# Paths
+paths:
+  data_dir: "data"
+  crawled_dir: "data/crawled" 
