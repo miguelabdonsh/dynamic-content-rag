@@ -12,6 +12,8 @@ from backend.models.schemas import (
 )
 from backend.services.ingestor import ContentIngestor
 from backend.services.rag_engine import RAGEngine
+from backend.services.cache import cache
+from backend.services.auto_ingest import auto_ingest
 from backend.config.settings import settings
 
 # Main Router
@@ -76,7 +78,8 @@ async def query_rag(request: QueryRequest):
             answer=result["answer"],
             sources=result["sources"],
             confidence=result["confidence"],
-            response_time=result["response_time"]
+            response_time=result["response_time"],
+            cached=result.get("cached", False)
         )
         
     except Exception as e:
@@ -174,4 +177,38 @@ async def search_content(q: str, limit: int = 5):
         }
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Search error: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"Search error: {str(e)}")
+
+@router.post("/auto-ingest/start")
+async def start_auto_ingest():
+    """Start automatic file watching and ingestion"""
+    if auto_ingest.is_running():
+        return {"message": "Auto-ingest already running", "status": "running"}
+    
+    auto_ingest.start_watching()
+    return {"message": "Auto-ingest started", "status": "started"}
+
+@router.post("/auto-ingest/stop")
+async def stop_auto_ingest():
+    """Stop automatic file watching"""
+    if not auto_ingest.is_running():
+        return {"message": "Auto-ingest not running", "status": "stopped"}
+    
+    auto_ingest.stop_watching()
+    return {"message": "Auto-ingest stopped", "status": "stopped"}
+
+@router.get("/auto-ingest/status")
+async def auto_ingest_status():
+    """Get auto-ingest status"""
+    return {
+        "running": auto_ingest.is_running(),
+        "processed_files": len(auto_ingest.processed_files)
+    }
+
+@router.get("/cache/status")
+async def cache_status():
+    """Get cache connection status"""
+    return {
+        "connected": cache.is_connected(),
+        "redis_url": settings.REDIS_URL
+    }

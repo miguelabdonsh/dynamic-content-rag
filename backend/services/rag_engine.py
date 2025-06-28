@@ -9,8 +9,8 @@ import openai
 import google.generativeai as genai
 from qdrant_client import QdrantClient
 
-
 from backend.config.settings import settings
+from backend.services.cache import cache
 
 class RAGEngine:
     """Optimized RAG Engine: OpenAI embeddings + Google Gemini generation"""
@@ -27,13 +27,22 @@ class RAGEngine:
         self.qdrant_client = QdrantClient(url=settings.QDRANT_URL)
     
     def _create_query_embedding(self, query: str) -> List[float]:
-        """Generate embedding for the query"""
+        """Generate embedding for the query with cache"""
+        # Check cache first
+        cached_embedding = cache.get_cached_embedding(query)
+        if cached_embedding:
+            return cached_embedding
+        
         try:
             response = self.openai_client.embeddings.create(
                 model=settings.EMBEDDING_MODEL,
                 input=[query]
             )
-            return response.data[0].embedding
+            embedding = response.data[0].embedding
+            
+            # Cache the embedding
+            cache.cache_embedding(query, embedding)
+            return embedding
         except Exception:
             return []
     
@@ -151,7 +160,14 @@ Answer:"""
         return round(confidence, 2)
     
     def answer_question(self, query: str, max_results: int = None) -> Dict[str, Any]:
-        """Complete pipeline: search + generate"""
+        """Complete pipeline: search + generate with cache"""
+        # Check cache first
+        cache_key = f"{query}_{max_results or settings.MAX_SEARCH_RESULTS}"
+        cached_result = cache.get_cached_query_result(cache_key)
+        if cached_result:
+            cached_result["cached"] = True
+            return cached_result
+        
         start_time = time.time()
         
         # Vector search
@@ -162,17 +178,23 @@ Answer:"""
         
         # Extract unique sources
         sources = list(set(chunk.get('source', '') for chunk in context_chunks))
-        sources = [s for s in sources if s]  # Filter out empties
+        sources = [s for s in sources if s]
         
         response_time = round(time.time() - start_time, 2)
         
-        return {
+        result = {
             "answer": answer,
             "sources": sources,
             "confidence": confidence,
             "response_time": response_time,
-            "chunks_found": len(context_chunks)
+            "chunks_found": len(context_chunks),
+            "cached": False
         }
+        
+        # Cache the result
+        cache.cache_query_result(cache_key, result)
+        
+        return result
     
     def get_collection_stats(self) -> Dict[str, Any]:
         """Get collection statistics"""

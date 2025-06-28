@@ -20,6 +20,7 @@ class QueryResponse(BaseModel):
     sources: List[str]
     confidence: float = Field(..., ge=0.0, le=1.0)
     response_time: float
+    cached: bool = Field(default=False)
 
 class IngestResponse(BaseModel):
     """Response from the ingestion"""

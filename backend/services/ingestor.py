@@ -179,4 +179,43 @@ class ContentIngestor:
             "files_processed": len(articles),
             "vectors_created": vectors_created,
             "message": f"Processed {len(articles)} articles into {vectors_created} vectors"
-        } 
+        }
+    
+    def process_specific_files(self, file_paths: List[Path]) -> Dict[str, Any]:
+        """Process only specific files"""
+        if not file_paths:
+            return {"success": False, "message": "No files provided"}
+        
+        articles = []
+        for file_path in file_paths:
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    articles.append(Article(**data))
+            except Exception:
+                pass
+        
+        if not articles:
+            return {"success": False, "message": "No valid articles found"}
+        
+        all_chunks = []
+        for article in articles:
+            chunks = self.chunk_content(article)
+            all_chunks.extend(chunks)
+        
+        vectors_created = self.store_chunks(all_chunks)
+        
+        return {
+            "success": True,
+            "files_processed": len(articles),
+            "vectors_created": vectors_created,
+            "message": f"Processed {len(articles)} new files into {vectors_created} vectors"
+        }
+    
+    def has_vectors(self) -> bool:
+        """Check if collection has any vectors"""
+        try:
+            info = self.qdrant_client.get_collection(settings.COLLECTION_NAME)
+            return info.points_count > 0
+        except Exception:
+            return False

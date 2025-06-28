@@ -12,16 +12,12 @@ import uvicorn
 from backend.config.settings import settings
 
 def main():
-    """Run FastAPI server"""
+    """Run FastAPI server - fully automatic"""
     print("Starting Crypto RAG API server...")
-    
-    # Server configuration
-    print(f"Server will start on http://{settings.API_HOST}:{settings.API_PORT}")
-    print(f"API docs available at http://{settings.API_HOST}:{settings.API_PORT}/docs")
-    print(f"Redoc available at http://{settings.API_HOST}:{settings.API_PORT}/redoc")
+    print(f"Server: http://{settings.API_HOST}:{settings.API_PORT}")
+    print(f"Docs: http://{settings.API_HOST}:{settings.API_PORT}/docs")
     
     try:
-        # Run server
         uvicorn.run(
             "backend.api.app:app",
             host=settings.API_HOST,
