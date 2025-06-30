@@ -1,6 +1,8 @@
+<div align="center">
+
 # Dynamic Content RAG System
 
-<div align="center">
+
 
 ![Dynamic Content RAG](https://img.shields.io/badge/RAG-Dynamic%20Content-blue?style=for-the-badge&logo=openai&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.12+-green?style=for-the-badge&logo=python&logoColor=white)
