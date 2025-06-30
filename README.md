@@ -11,7 +11,7 @@
 
 *Transform crypto data into intelligent insights with real-time vector search, semantic understanding, and dynamic content generation*
 
-[Quick Start](#-quick-start) • [Features](#-features) • [Architecture](#️-architecture) • [API Reference](#-api-reference) • [Contributing](#-contributing)
+[Quick Start](#quick-start) • [Features](#features) • [Architecture](#architecture) • [API Reference](#api-reference) 
 
 </div>
 
