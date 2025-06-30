@@ -6,7 +6,7 @@ from datetime import datetime
 # Request Models
 class QueryRequest(BaseModel):
     """Request to query the RAG"""
-    question: str = Field(..., min_length=3, max_length=500)
+    question: str = Field(..., min_length=3, max_length=2000)
     max_results: int = Field(default=5, ge=1, le=20)
 
 class IngestRequest(BaseModel):

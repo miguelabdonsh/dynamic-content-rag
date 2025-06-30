@@ -45,7 +45,13 @@ class RAGAPIClient:
             st.error("Request timed out. Try again.")
             return None
         except requests.exceptions.HTTPError as e:
-            st.error(f"API Error: {e.response.status_code}")
+            # Show detailed error for debugging
+            error_detail = ""
+            try:
+                error_detail = e.response.json().get('detail', '')
+            except:
+                error_detail = e.response.text
+            st.error(f"API Error: {e.response.status_code} - {error_detail}")
             return None
         except Exception as e:
             st.error(f"Unexpected error: {str(e)}")
@@ -77,28 +83,29 @@ class RAGAPIClient:
     def generate_article(self, topic: str, context_sources: List[str] = None) -> Optional[str]:
         """Generate article using RAG context"""
         # First get relevant context
-        search_results = self.search_content(topic, limit=8)
+        search_results = self.search_content(topic, limit=5)  # Reduced from 8 to 5
         if not search_results:
             return None
         
-        # Build context from search results
-        context_texts = [result['text'][:500] + "..." for result in search_results.get('results', [])]
-        context = "\n\n".join(context_texts)
+        # Build more concise context from search results
+        context_texts = []
+        for result in search_results.get('results', []):
+            # Use only first 200 chars instead of 500 to keep prompt manageable
+            snippet = result['text'][:200].strip()
+            if snippet:
+                context_texts.append(f"• {snippet}...")
         
-        # Generate article using the query endpoint with a structured prompt
-        article_prompt = f"""Write a comprehensive crypto news article about: {topic}
-
-Based on this context from recent crypto news:
-{context}
-
-Requirements:
-- Professional journalism style
-- Include key facts and data
-- Structure with clear paragraphs
-- Cite relevant information from the context
-- Keep it informative and engaging"""
+        context = "\n".join(context_texts)
         
-        result = self.query_rag(article_prompt, max_results=8)
+        # More concise and efficient prompt
+        article_prompt = f"""Create a crypto news article about: {topic}
+
+            Context from recent news:
+            {context}
+
+            Write a professional, informative article with clear structure and key facts."""
+        
+        result = self.query_rag(article_prompt, max_results=5)  # Reduced from 8 to 5
         return result.get('answer') if result else None
 
 
