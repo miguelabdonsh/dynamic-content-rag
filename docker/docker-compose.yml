@@ -1,0 +1,42 @@
+services:
+  # Qdrant Vector Database
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: rag-qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - ../data/qdrant:/qdrant/storage
+    restart: unless-stopped
+    networks:
+      - rag-network
+
+  # Redis Cache
+  redis:
+    image: redis:latest
+    container_name: rag-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ../data/redis:/data
+    restart: unless-stopped
+    networks:
+      - rag-network
+
+  # CrawlAI Service
+  crawlai:
+    image: unclecode/crawl4ai:latest
+    container_name: rag-crawlai
+    ports:
+      - "11235:11235"
+    environment:
+      - PYTHONUNBUFFERED=1
+    shm_size: 1g
+    restart: unless-stopped
+    networks:
+      - rag-network
+
+networks:
+  rag-network:
+    driver: bridge
+    name: rag-network 
